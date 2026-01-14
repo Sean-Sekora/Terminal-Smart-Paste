@@ -1,15 +1,20 @@
-<!-- Plugin Configuration File. Read more: https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html -->
 <idea-plugin>
-    <id>com.github.seansekora.terminalsmartpaste</id>
+    <id>ai.sekora.terminalsmartpaste</id>
     <name>Terminal-Smart-Paste</name>
-    <vendor>sean-sekora</vendor>
+    <vendor>Sekora AI</vendor>
 
     <depends>com.intellij.modules.platform</depends>
+    <depends>org.jetbrains.plugins.terminal</depends>
 
     <resource-bundle>messages.MyBundle</resource-bundle>
 
-    <extensions defaultExtensionNs="com.intellij">
-        <toolWindow factoryClass="com.github.seansekora.terminalsmartpaste.toolWindow.MyToolWindowFactory" id="MyToolWindow"/>
-        <postStartupActivity implementation="com.github.seansekora.terminalsmartpaste.startup.MyProjectActivity" />
-    </extensions>
+    <actions>
+        <!-- Standalone action - no group, available via Find Action (Cmd+Shift+A) -->
+        <action id="TerminalSmartPaste"
+                class="ai.sekora.terminalsmartpaste.SmartPasteAction"
+                text="Smart Paste"
+                description="Intelligently pastes file paths, images, and text">
+            <keyboard-shortcut keymap="$default" first-keystroke="shift meta V"/>
+        </action>
+    </actions>
 </idea-plugin>
