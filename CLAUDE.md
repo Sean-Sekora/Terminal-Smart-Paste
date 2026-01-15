@@ -13,13 +13,29 @@ Built on the [IntelliJ Platform Plugin Template](https://github.com/JetBrains/in
 
 ## How to Use
 
+### Prerequisites
+
+**IMPORTANT: Classic Terminal Required**
+
+This plugin currently only works with the **Classic Terminal** implementation, not the new "Reworked 2025" terminal. To enable Classic terminal:
+
+1. Open **Settings** (`Cmd+,` on macOS)
+2. Navigate to **Tools → Terminal**
+3. Find **"Use new terminal instead of classic"** or similar setting
+4. **Uncheck** this option to switch to Classic terminal
+5. Click **OK** or **Apply**
+6. **Close and reopen** any existing terminal tabs
+
+**Why Classic Terminal?** The new Reworked Terminal API won't be stable until IntelliJ 2025.3+. JetBrains has committed to supporting the Classic Terminal API for at least two more releases, so this plugin will continue working through 2025.x versions.
+
 ### Accessing Smart Paste
 
 **Primary Method: Find Action**
-1. Open the Terminal tool window in IntelliJ
+1. Open the Terminal tool window in IntelliJ (Classic terminal must be enabled)
 2. Copy content (image, file, or text) to clipboard
 3. Press `Cmd+Shift+A` (macOS) or `Ctrl+Shift+A` (Windows/Linux)
 4. Type "Smart Paste" and press Enter
+5. The content will be pasted at your cursor **without executing**
 
 **Optional: Custom Keyboard Shortcut**
 
@@ -171,6 +187,11 @@ Test framework: IntelliJ Platform Test Framework (built on JUnit)
 
 ## Known Issues & Limitations
 
+- **Terminal requirement**:
+  - **Only works with Classic Terminal**, not the new "Reworked 2025" terminal
+  - Users must disable "Use new terminal" in Settings → Tools → Terminal
+  - Reworked Terminal API support planned for when IntelliJ 2025.3+ API stabilizes
+  - JetBrains committed to supporting Classic Terminal through at least two more releases
 - **Action accessibility**:
   - Keyboard shortcuts may not work due to system-level conflicts and IntelliJ keymap precedence
   - Context menu integration not available (terminal context menu groups are unstable in 2025.2.5)

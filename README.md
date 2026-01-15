@@ -18,11 +18,17 @@
 - [ ] Configure the [CODECOV_TOKEN](https://docs.codecov.com/docs/quick-start) secret for automated test coverage reports on PRs
 
 <!-- Plugin description -->
-This Fancy IntelliJ Platform Plugin is going to be your implementation of the brilliant ideas that you have.
+Intelligently paste clipboard content into your terminal with automatic format conversion.
 
-This specific section is a source for the [plugin.xml](/src/main/resources/META-INF/plugin.xml) file which will be extracted by the [Gradle](/build.gradle.kts) during the build process.
+**Features:**
+- **Images** → Saved to temp file, path pasted into terminal
+- **Files** → File paths pasted (automatically quoted if needed)
+- **Text** → Plain text pasted as-is
 
-To keep everything working, do not remove `<!-- ... -->` sections. 
+**How to Use:**
+Copy any content (image, file, or text), then press `Cmd+Shift+A` (macOS) or `Ctrl+Shift+A` (Windows/Linux), type "Smart Paste" and press Enter. Content will be pasted at your cursor without executing.
+
+**Note:** Currently requires Classic Terminal. Go to Settings → Tools → Terminal and disable "Use new terminal instead of classic" option.
 <!-- Plugin description end -->
 
 ## Installation

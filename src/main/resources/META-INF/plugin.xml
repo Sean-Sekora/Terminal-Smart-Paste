@@ -6,15 +6,13 @@
     <depends>com.intellij.modules.platform</depends>
     <depends>org.jetbrains.plugins.terminal</depends>
 
-    <resource-bundle>messages.MyBundle</resource-bundle>
-
     <actions>
         <!-- Standalone action - no group, available via Find Action (Cmd+Shift+A) -->
         <action id="TerminalSmartPaste"
                 class="ai.sekora.terminalsmartpaste.SmartPasteAction"
                 text="Smart Paste"
                 description="Intelligently pastes file paths, images, and text">
-            <keyboard-shortcut keymap="$default" first-keystroke="shift meta V"/>
+            <keyboard-shortcut keymap="$default" first-keystroke="alt V"/>
         </action>
     </actions>
 </idea-plugin>

@@ -134,6 +134,10 @@ tasks {
     publishPlugin {
         dependsOn(patchChangelog)
     }
+
+    named("instrumentCode") {
+        enabled = false
+    }
 }
 
 intellijPlatformTesting {

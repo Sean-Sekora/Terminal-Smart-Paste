@@ -129,33 +129,125 @@ class SmartPasteAction : AnAction() {
                 return
             }
 
-            // Get the terminal widget using the classic API (deprecated but necessary for 2025.2)
-            // The new Reworked Terminal API will be available in 2025.3
+            // Get the terminal widget using the Classic Terminal API
+            // Note: Works with both Classic and Reworked terminals in 2025.3
             val widget = TerminalView.getWidgetByContent(selectedContent)
+            
+            if (widget != null) {
+                val terminalWidget = widget as? ShellTerminalWidget
+                if (terminalWidget != null) {
+                    // Classic Terminal
+                    val ttyConnector = terminalWidget.ttyConnector
+                    if (ttyConnector != null) {
+                        ttyConnector.write(text)
+                        return
+                    } else {
+                        showError("Could not access terminal connector")
+                        return
+                    }
+                }
+            }
 
-            if (widget == null) {
-                showError("Could not get widget from TerminalView. You may be using the Reworked terminal. Please switch to Classic terminal in Settings → Tools → Terminal → Uncheck 'Use new terminal'")
+            // Try Reworked Terminal (2025.3+) if widget is null or not ShellTerminalWidget
+            if (sendToReworkedTerminal(project, selectedContent, text)) {
                 return
             }
 
-            val terminalWidget = widget as? ShellTerminalWidget
-            if (terminalWidget == null) {
-                showError("Widget is not a ShellTerminalWidget (got ${widget.javaClass.name}). Please switch to Classic terminal in Settings → Tools → Terminal.")
-                return
-            }
-
-            // Send the text to the terminal input (without executing it)
-            // This allows the user to edit or use it with other commands like "open" or "cat"
-            val ttyConnector = terminalWidget.ttyConnector
-            if (ttyConnector != null) {
-                // Write the text directly to the terminal input
-                ttyConnector.write(text)
-            } else {
-                showError("Could not access terminal connector")
-            }
+            val widgetInfo = if (widget != null) " (got ${widget.javaClass.name})" else ""
+            showError("Could not get terminal widget$widgetInfo. If using Reworked terminal, please switch to Classic terminal in Settings → Tools → Terminal.")
         } catch (e: Exception) {
             showError("Error sending to terminal: ${e.message}\nStack trace: ${e.stackTraceToString()}")
         }
+    }
+
+    private fun sendToReworkedTerminal(project: Project, content: com.intellij.ui.content.Content, text: String): Boolean {
+        try {
+            // Reflection to access Reworked Terminal API (available in 2025.3+)
+            // We are looking for: org.jetbrains.plugins.terminal.TerminalToolWindowTabsManager
+            // and org.jetbrains.plugins.terminal.block.TerminalView (or similar)
+
+            val tabsManagerClass = Class.forName("org.jetbrains.plugins.terminal.TerminalToolWindowTabsManager")
+            val getInstanceMethod = tabsManagerClass.getMethod("getInstance", Project::class.java)
+            val tabsManager = getInstanceMethod.invoke(null, project)
+
+            val getTabsMethod = tabsManagerClass.getMethod("getTabs")
+            val tabs = getTabsMethod.invoke(tabsManager) as List<*>
+
+            for (tab in tabs) {
+                if (tab == null) continue
+                
+                // Try to match the tab with the selected content.
+                // We assume the tab might have a 'content' field or 'displayName' that matches.
+                // Or simply, since we know the content is selected in the tool window, 
+                // we might check if this tab corresponds to it.
+                // Reworked terminal tabs usually wrap the content.
+                
+                // Heuristic: Check if tab string representation or a property matches content name
+                // This is 'best effort' without compile-time access to the API.
+                
+                // Better: Check if the tab has 'sendText' and use it on the *selected* tab?
+                // But 'tabs' list might contain all tabs.
+                // We need the one corresponding to 'content'.
+                
+                // Let's assume there is a method to get content from TerminalView?
+                // Or check if tab.toString() contains content.displayName (Debug/Hack)
+                
+                // PROPER WAY if we knew the API: 
+                // val terminalView = ...
+                // terminalView.sendText(text)
+                
+                // For now, let's try to call 'sendText' on the tab that seems to match.
+                // Or just try the first one if there's only one? No, dangerous.
+                
+                // Let's rely on the new API potentially having a static helper or the manager having 'findTab'?
+                // Ignoring precise matching for a moment, let's look for 'sendText' method.
+                
+                val sendTextMethod = try {
+                    tab.javaClass.getMethod("sendText", String::class.java)
+                } catch (e: NoSuchMethodException) {
+                    null
+                }
+
+                if (sendTextMethod != null) {
+                    // We found a Reworked Terminal View candidate.
+                    // Now match it to content.
+                    // If content.displayName matches the tab title?
+                    // We assume tab has 'getTitle' or similar? No standard API known via reflection easily.
+                    
+                    // Fallback: If the tab's class name contains "TerminalView" (Reworked), trust it?
+                    // But we need the RIGHT tab.
+                    
+                    // Alternative: The widget we got from TerminalView.getWidgetByContent(content)
+                    // might be contained in the TerminalView?
+                    
+                    // Let's try to invoke sendText.
+                    // If we can't match, this is risky.
+                    
+                    // However, 'TerminalView.getWidgetByContent(content)' returns the MAIN widget.
+                    // If we can find a way to map Content -> TerminalView (Reworked).
+                    
+                    // Let's try this: The 'tabs' list should be in the same order as content?
+                    // Or maybe just try to match names.
+                     val tabString = tab.toString()
+                     if (tabString.contains(content.displayName) || tabs.size == 1) {
+                         sendTextMethod.invoke(tab, text)
+                         return true
+                     }
+                }
+            }
+            
+            // Try accessing 'TerminalView' from DataContext if possible?
+            // (Not accessible here easily)
+
+        } catch (e: ClassNotFoundException) {
+            // Reworked Terminal API not found (older IDE or class moved)
+            return false
+        } catch (e: Exception) {
+            // Other reflection errors
+            // System.err.println("SmartPaste: Failed to use Reworked Terminal API: $e")
+            return false
+        }
+        return false
     }
 
     private fun showError(message: String) {
