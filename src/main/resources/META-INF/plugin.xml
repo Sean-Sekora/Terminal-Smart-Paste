@@ -12,7 +12,7 @@
                 class="ai.sekora.terminalsmartpaste.SmartPasteAction"
                 text="Smart Paste"
                 description="Intelligently pastes file paths, images, and text">
-            <keyboard-shortcut keymap="$default" first-keystroke="alt V"/>
+            <keyboard-shortcut keymap="$default" first-keystroke="control V"/>
         </action>
     </actions>
 </idea-plugin>
