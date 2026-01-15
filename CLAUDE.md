@@ -65,6 +65,39 @@ To assign your own shortcut:
 
 **Note:** The action requires the Terminal tool window to be active. If invoked outside terminal context, it will silently fail.
 
+## Installing Locally
+
+### Option 1: Install Built Plugin (Recommended for daily use)
+
+Build the plugin and install it in your main IntelliJ:
+
+```bash
+./gradlew buildPlugin
+```
+
+This creates a plugin ZIP file at `build/distributions/Terminal-Smart-Paste-<version>.zip`
+
+Then in your IntelliJ IDEA:
+1. Go to **Settings** (`Cmd+,`)
+2. Navigate to **Plugins**
+3. Click the **⚙️** (gear icon) → **Install Plugin from Disk...**
+4. Select the ZIP file from `build/distributions/`
+5. Click **OK** and restart IntelliJ
+
+### Option 2: Test in Separate IDE Instance (For development/testing)
+
+Run a separate IntelliJ instance with the plugin pre-installed:
+
+```bash
+./gradlew runIde
+```
+
+This launches a sandboxed IntelliJ with your plugin already loaded - perfect for testing without affecting your main IDE.
+
+**Which to use?**
+- Use **Option 1** if you want to use the plugin in your everyday IntelliJ
+- Use **Option 2** if you're still testing/developing features
+
 ## Build Requirements
 
 **JDK**: Requires JDK 21. **CRITICAL**: Do NOT use Microsoft JDK - it has a known compatibility issue with IntelliJ Platform Gradle Plugin's `instrumentCode` task (missing `Packages` directory). Use one of these instead:
